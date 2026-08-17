@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КП – Цифровой контур для клиники «Миннесота»</title>
+<meta name="description" content="Коммерческое предложение: сайт, админка, мобильное приложение и визитки с QR для клиники лечения зависимостей «Миннесота», Саратов.">
+<meta name="robots" content="noindex">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="КП – Цифровой контур для клиники «Миннесота»">
+<meta property="og:description" content="Сайт, админка, приложение и визитки с QR – система, в которой не теряется ни один звонок и ни одна заявка.">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --bg-raise:#F4F5F6;
+    --bg-card:#FBFBFC;
+    --line:#E0E0E0;
+    --ink:#121212;
+    --ink-dim:#4B4F55;
+    --ink-faint:#878B92;
+    --brand:#00FF66;        /* кислотный – только акценты и иконки */
+    --brand-deep:#008F42;   /* читаемый зелёный для текста на белом */
+    --brand-ink:#121212;
+    --ok:#00B856;
+    --display:'Unbounded',system-ui,sans-serif;
+    --body:'Manrope',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:var(--body);font-size:17px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  a{color:inherit}
+  img,svg{display:block;max-width:100%}
+  ::selection{background:var(--brand);color:var(--brand-ink)}
+  :focus-visible{outline:2px solid var(--brand);outline-offset:3px;border-radius:2px}
+
+  /* сигнатура: рамка-скобка */
+  .cbr{position:relative}
+  .cbr::before,.cbr::after{content:"";position:absolute;width:22px;height:22px;pointer-events:none}
+  .cbr::before{top:0;left:0;border-top:3px solid var(--brand);border-left:3px solid var(--brand)}
+  .cbr::after{bottom:0;right:0;border-bottom:3px solid var(--brand);border-right:3px solid var(--brand)}
+
+  /* ---------- каркас дека ---------- */
+  .deck{height:100%;overflow:hidden}
+  .track{display:flex;height:100%;transition:transform .45s cubic-bezier(.65,.05,.36,1)}
+  .slide{
+    flex:0 0 100vw;width:100vw;height:100%;
+    overflow-y:auto;overflow-x:hidden;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:76px 0 84px;
+  }
+  .wrap{max-width:1160px;margin:0 auto;padding:0 56px;width:100%}
+
+  /* ---------- хром ---------- */
+  .bar{position:fixed;top:0;left:0;height:3px;background:var(--brand);width:0;z-index:60;transition:width .45s ease}
+  .chrome-top{
+    position:fixed;top:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;pointer-events:none;
+  }
+  .chrome-top .mark{display:flex;align-items:center;gap:10px;pointer-events:auto;text-decoration:none}
+  .chrome-top .mark svg{width:26px;height:26px}
+  .chrome-top .mark b{font-family:var(--display);font-weight:500;font-size:14px;letter-spacing:.02em}
+  .chrome-top .mark span{display:block;font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase}
+  .counter{font-family:var(--mono);font-size:12.5px;color:var(--ink-faint);letter-spacing:.08em}
+  .counter b{color:var(--brand-deep);font-weight:600}
+  .chrome-bottom{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;
+  }
+  .hint{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);letter-spacing:.06em}
+  .hint kbd{border:1px solid var(--line);border-radius:3px;padding:1px 6px;font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+  .navbtns{display:flex;gap:10px}
+  .nbtn{
+    width:44px;height:44px;border-radius:4px;border:1px solid var(--line);
+    background:var(--bg-raise);color:var(--ink);cursor:pointer;
+    font-size:18px;line-height:1;display:grid;place-items:center;
+    transition:border-color .15s,color .15s;
+  }
+  .nbtn:hover{border-color:var(--brand);color:var(--brand-deep)}
+  .nbtn:disabled{opacity:.3;cursor:default}
+  .nbtn:disabled:hover{border-color:var(--line);color:var(--ink)}
+
+  /* ---------- типовые элементы слайдов ---------- */
+  .eyebrow{
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--brand-deep);margin-bottom:20px;display:flex;align-items:center;gap:12px;
+  }
+  .eyebrow i{font-style:normal;color:var(--ink-faint)}
+  h1{
+    font-family:var(--display);font-weight:500;
+    font-size:clamp(30px,4.6vw,58px);line-height:1.12;letter-spacing:-.01em;
+    max-width:22ch;
+  }
+  h1 em,h2 em{
+    font-style:normal;color:var(--brand-ink);background:var(--brand);
+    padding:0 .14em;border-radius:3px;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  }
+  h2{
+    font-family:var(--display);font-weight:500;
+    font-size:clamp(24px,3.2vw,40px);line-height:1.18;letter-spacing:-.01em;
+    max-width:26ch;margin-bottom:16px;
+  }
+  .sub{color:var(--ink-dim);font-size:clamp(17px,1.6vw,20px);max-width:58ch;margin-top:22px}
+  .lead{color:var(--ink-dim);font-size:17px;max-width:64ch;margin-bottom:36px}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--bg-card);border:1px solid var(--line);padding:22px 24px;border-radius:4px}
+  .card h3{font-family:var(--body);font-weight:800;font-size:16.5px;margin-bottom:8px}
+  .card p{font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+  .card .num{font-family:var(--mono);font-size:12px;color:var(--brand-deep);letter-spacing:.1em;display:block;margin-bottom:12px}
+  .tag{
+    display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--brand-deep);border:1px solid rgba(0,255,102,.5);border-radius:100px;padding:4px 12px;
+  }
+
+  /* титул */
+  .title-slide .logo-big{display:flex;align-items:center;gap:16px;margin-bottom:56px}
+  .title-slide .logo-big svg{width:44px;height:44px}
+  .title-slide .logo-big b{font-family:var(--display);font-weight:500;font-size:20px}
+  .title-slide .logo-big span{display:block;font-family:var(--mono);font-size:11px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase}
+  .title-meta{display:flex;gap:28px;flex-wrap:wrap;margin-top:48px;font-family:var(--mono);font-size:13px;color:var(--ink-faint)}
+  .title-meta b{color:var(--ink-dim);font-weight:400}
+
+  /* факты о текущем сайте */
+  .fact{border-left:3px solid var(--line);padding:6px 0 6px 18px}
+  .fact b{display:block;font-size:15.5px;margin-bottom:4px}
+  .fact span{font-size:14px;color:var(--ink-dim);line-height:1.45}
+  .fact.bad{border-left-color:#C0553B}
+  .src{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint);margin-top:26px}
+  .src a{color:var(--ink-dim)}
+
+  /* цена вопроса */
+  .bignum{display:flex;gap:20px;flex-wrap:wrap;margin:34px 0}
+  .bignum .bn{flex:1;min-width:240px;background:var(--bg-raise);padding:26px 28px;border-radius:4px}
+  .bignum b{font-family:var(--mono);font-weight:600;font-size:clamp(26px,3vw,40px);display:block;letter-spacing:-.02em}
+  .bignum b.q{color:var(--brand-deep)}
+  .bignum span{font-size:14.5px;color:var(--ink-dim);display:block;margin-top:10px;line-height:1.5}
+  .fine{font-size:13px;color:var(--ink-faint);max-width:70ch}
+
+  /* решение: три столпа */
+  .pillar{padding:30px 28px}
+  .pillar .ic{width:44px;height:44px;border-radius:4px;background:rgba(0,255,102,.14);display:grid;place-items:center;margin-bottom:18px;color:var(--brand-deep)}
+  .pillar h3{font-size:18px}
+  .pillar p{font-size:15px;margin-top:8px}
+
+  /* telegram-слайд */
+  .tg-flow{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center}
+  .steps{display:flex;flex-direction:column;gap:0}
+  .step{display:flex;gap:18px;position:relative;padding-bottom:26px}
+  .step::before{content:"";position:absolute;left:15px;top:34px;bottom:0;width:2px;background:var(--line)}
+  .step:last-child::before{display:none}
+  .step .dot{
+    flex:none;width:32px;height:32px;border-radius:50%;
+    border:2px solid var(--brand);color:var(--brand-deep);
+    font-family:var(--mono);font-size:13px;font-weight:600;
+    display:grid;place-items:center;background:var(--bg);
+  }
+  .step b{display:block;font-size:16px;margin-bottom:3px}
+  .step span{font-size:14.5px;color:var(--ink-dim);line-height:1.5}
+  .tg-card{background:#17212B;border:1px solid #26333F;border-radius:10px;overflow:hidden;box-shadow:0 24px 60px rgba(18,18,18,.16)}
+  .tg-head{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#1F2C38;border-bottom:1px solid #26333F}
+  .tg-head .ava{width:36px;height:36px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:800;font-size:15px}
+  .tg-head b{font-size:15px;display:block}
+  .tg-head span{font-size:12.5px;color:#7D8B99}
+  .tg-body{padding:18px 16px 20px}
+  .tg-msg{background:#182533;border-radius:10px;border-top-left-radius:2px;padding:14px 16px;max-width:420px}
+  .tg-msg .from{color:var(--brand);font-weight:700;font-size:13.5px;margin-bottom:8px}
+  .tg-msg p{font-size:14.5px;line-height:1.6;color:#E8EEF3}
+  .tg-msg p b{color:#fff}
+  .tg-msg .utm{font-family:var(--mono);font-size:12px;color:#6FB2E0;margin-top:10px;line-height:1.7}
+  .tg-msg .time{text-align:right;font-size:11.5px;color:#5F7181;margin-top:8px}
+  .tg-note{font-size:13.5px;color:var(--ink-faint);margin-top:16px;text-align:center}
+
+  /* QR-слайд */
+  .qr-row{display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;margin:36px 0 10px}
+  .qr-item{text-align:center}
+  .qr-plate{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;width:min(230px,62vw)}
+  .qr-plate svg{width:100%;height:auto}
+  .qr-item .cap{font-family:var(--mono);font-size:12.5px;color:var(--ink-dim);margin-top:12px;letter-spacing:.04em}
+  .qr-item .cap b{color:var(--brand-deep);font-weight:600;display:block;margin-bottom:2px}
+
+  /* сроки */
+  .sprints{display:grid;grid-template-columns:3fr 5fr 4fr;gap:14px;margin-top:36px}
+  .sprint{background:var(--bg-card);border:1px solid var(--line);border-top:3px solid var(--brand);padding:22px 24px;border-radius:4px}
+  .sprint .d{font-family:var(--mono);font-size:12px;color:var(--brand-deep);letter-spacing:.1em;display:block;margin-bottom:10px}
+  .sprint b{display:block;font-size:16px;margin-bottom:8px}
+  .sprint p{font-size:14px;color:var(--ink-dim);line-height:1.5}
+
+  /* тарифы */
+  .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:stretch}
+  .plan{display:flex;flex-direction:column;padding:22px 20px}
+  .plan.hot{border-color:var(--brand)}
+  .plan .tag{margin-bottom:14px;align-self:flex-start}
+  .plan h3{font-size:16px;margin-bottom:4px}
+  .plan .price{font-family:var(--mono);font-weight:600;font-size:clamp(19px,1.8vw,24px);margin:8px 0 16px;letter-spacing:-.02em}
+  .plan .price i{font-style:normal;font-size:12.5px;color:var(--ink-faint);font-family:var(--body)}
+  .plan ul{list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--ink-dim)}
+  .plan li{padding-left:20px;position:relative}
+  .plan li::before{content:"–";position:absolute;left:0;color:var(--brand-deep);font-weight:700}
+  .pay-note{margin-top:26px;font-size:14.5px;color:var(--ink-dim)}
+  .pay-note b{color:var(--ink)}
+
+  /* следующие шаги */
+  .contact-box{margin-top:44px;padding:30px 34px;display:flex;gap:40px;flex-wrap:wrap;align-items:center;background:var(--bg-raise)}
+  .contact-box .who b{font-family:var(--display);font-weight:500;font-size:18px;display:block;margin-bottom:4px}
+  .contact-box .who span{font-size:14px;color:var(--ink-dim)}
+  .contact-box .links{margin-left:auto;display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:14px}
+  .contact-box .links a{color:var(--brand-deep);text-decoration:none}
+  .contact-box .links a:hover{text-decoration:underline}
+
+  /* ---------- мобильная версия: вертикальный скролл ---------- */
+  @media (max-width:900px){
+    body{overflow:auto}
+    .deck{height:auto;overflow:visible}
+    .track{display:block;transform:none !important;height:auto}
+    .slide{width:100%;height:auto;min-height:100svh;flex:none;padding:84px 0 56px}
+    .wrap{padding:0 22px}
+    .chrome-bottom,.counter{display:none}
+    .g2,.g3,.g4,.plans,.sprints,.tg-flow{grid-template-columns:1fr}
+    .tg-flow{gap:32px}
+    .qr-row{justify-content:center}
+    .chrome-top{background:rgba(255,255,255,.88);backdrop-filter:blur(10px);padding:12px 20px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .track,.bar{transition:none}
+  }
+
+  /* ---------- печать ---------- */
+  @media print{
+    body{overflow:visible;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .deck{height:auto;overflow:visible}
+    .track{display:block;transform:none !important;height:auto}
+    .slide{width:100%;height:auto;min-height:0;page-break-after:always;padding:40px 0}
+    .chrome-top,.chrome-bottom,.bar{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+
+<div class="chrome-top">
+  <!-- TODO: добавьте телефон/Telegram, когда решите публиковать -->
+  <a class="mark" href="mailto:omelchenko.sales1@gmail.com">
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M17 13 6 24l11 11" stroke="#00E25B" stroke-width="4" stroke-linecap="square"/>
+      <path d="M31 13l11 11-11 11" stroke="#00E25B" stroke-width="4" stroke-linecap="square"/>
+      <path d="M27 9 21 39" stroke="#121212" stroke-width="4" stroke-linecap="square"/>
+    </svg>
+    <b>omenik.digital<span>сайты · админки · приложения</span></b>
+  </a>
+  <div class="counter" id="counter"><b>01</b> / 11</div>
+</div>
+
+<div class="deck">
+<div class="track" id="track">
+
+<!-- 1. ТИТУЛ -->
+<section class="slide title-slide">
+  <div class="wrap">
+    <div class="logo-big">
+      <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M17 13 6 24l11 11" stroke="#00E25B" stroke-width="4" stroke-linecap="square"/>
+        <path d="M31 13l11 11-11 11" stroke="#00E25B" stroke-width="4" stroke-linecap="square"/>
+        <path d="M27 9 21 39" stroke="#121212" stroke-width="4" stroke-linecap="square"/>
+      </svg>
+      <b>omenik.digital<span>сайты · админки · приложения</span></b>
+    </div>
+    <div class="eyebrow">Коммерческое предложение <i>· август 2026</i></div>
+    <h1>Цифровой контур для клиники <em>«Миннесота»</em></h1>
+    <p class="sub">Быстрый сайт, админка, мобильное приложение и визитки с QR – единая система, в которой не теряется ни один звонок и ни одна заявка.</p>
+    <div class="title-meta">
+      <div>Для: <b>клиника «Миннесота», г. Саратов</b></div>
+      <div>От: <b>Никита Омельченко · Omenik.Digital</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. СИТУАЦИЯ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">01 · Ситуация</div>
+    <h2>Сайт есть – но он <em>теряет обращения</em></h2>
+    <p class="lead">Я разобрал код minnesotasar.ru. Контента много: врачи, услуги, цены, отзывы. Но техническая база работает против клиники – особенно на телефоне, с которого и приходят срочные обращения.</p>
+    <div class="grid g2">
+      <div class="fact bad"><b>Пустые кнопки звонка</b><span>3 из 12 tel-ссылок на главной – без номера: нажатие не делает ничего. Человек в кризисный момент решает, что сайт сломан, и уходит.</span></div>
+      <div class="fact bad"><b>Номера вразнобой</b><span>Часть номеров записана как 8&nbsp;845…, часть – без +7. На части устройств такой звонок не проходит; единого стандарта tel:+7… на сайте нет.</span></div>
+      <div class="fact bad"><b>Тяжёлая главная</b><span>~0,5 МБ одного только HTML, 46 скриптов, 54 изображения. На мобильном интернете – долгие секунды до того, как появится номер телефона.</span></div>
+      <div class="fact bad"><b>Нет онлайн-записи</b><span>Шесть форм «перезвоните мне», дублирующих друг друга. Записаться на время к конкретному специалисту нельзя.</span></div>
+      <div class="fact bad"><b>Обращения не считаются</b><span>Метрика подключена, но при шести разных формах и разных номерах сквозной картины нет: неизвестно, какая реклама приводит пациентов.</span></div>
+      <div class="fact bad"><b>Стек прошлого поколения</b><span>jQuery и десятки подключаемых скриптов, наслоения с 2012 года. Каждая новая правка делает сайт тяжелее и дороже в поддержке.</span></div>
+    </div>
+    <p class="src">Источник: аудит кода minnesotasar.ru, август 2026. Полный технический разбор – при встрече.</p>
+  </div>
+</section>
+
+<!-- 3. ЦЕНА ВОПРОСА -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">02 · Цена вопроса</div>
+    <h2>Потерянное обращение – это пациент, <em>ушедший к конкуренту</em></h2>
+    <div class="bignum">
+      <div class="bn"><b>03:47</b><span>обращения в наркологию приходят круглосуточно, чаще ночью и с телефона. Человек, у которого не сработала кнопка звонка, не перезвонит утром – он позвонит в следующую клинику из выдачи</span></div>
+      <div class="bn"><b>3 из 12</b><span>кнопок звонка на главной – с пустым номером. Сколько людей нажали, не дозвонились и ушли – не знает никто</span></div>
+      <div class="bn"><b class="q">?</b><span>сколько обращений теряется на скорости, формах и битых номерах – неизвестно: сквозной аналитики нет. Это и есть главная проблема</span></div>
+    </div>
+    <p class="lead">Приём в клинике – от 1 500 ₽, а курс лечения зависимости – это недели стационара и месяцы реабилитации. Одно спасённое ночное обращение окупает весь новый сайт.</p>
+    <p class="fine">Ориентир – по ценам, опубликованным на текущем сайте клиники.</p>
+  </div>
+</section>
+
+<!-- 4. РЕШЕНИЕ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">03 · Решение</div>
+    <h2>Единый контур: <em>от QR на визитке до приложения</em></h2>
+    <p class="lead">Четыре элемента, которые работают как одна система. Можно начать с сайта – и подключать остальное поэтапно, без переделок.</p>
+    <div class="grid g3">
+      <div class="card pillar cbr">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8L19 10h-7l1-8z"/></svg></div>
+        <h3>Мгновенный сайт</h3>
+        <p>Свой код, скорость 90+ по PageSpeed. Номер, короткая форма и онлайн-запись – на первом экране, звонок в один тап с любого устройства.</p>
+      </div>
+      <div class="card pillar cbr">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        <h3>Обращения без потерь</h3>
+        <p>Каждая заявка через 2–3 секунды у дежурного – в Telegram, MAX или ВК – и на почте, с UTM-меткой, откуда пришёл человек. Все кнопки звонка рабочие.</p>
+      </div>
+      <div class="card pillar cbr">
+        <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg></div>
+        <h3>Управление и рост</h3>
+        <p>Админка: врачи, цены и акции меняете сами. Дальше – мобильное приложение для пациентов и офлайн-точки входа: QR на визитках.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. КАК ПРИХОДИТ ОБРАЩЕНИЕ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">04 · Как это работает</div>
+    <h2>Путь обращения: <em>секунды</em>, а не сутки</h2>
+    <div class="tg-flow" style="margin-top:36px">
+      <div class="steps">
+        <div class="step"><div class="dot">1</div><div><b>Человек попадает на сайт</b><span>С поиска, рекламы или QR на визитке. Номер и короткая форма – сразу на первом экране.</span></div></div>
+        <div class="step"><div class="dot">2</div><div><b>Звонок в один тап или заявка из двух полей</b><span>Имя (можно не указывать) и телефон. Анонимность подчёркнута прямо у формы – в этой сфере это решающее.</span></div></div>
+        <div class="step"><div class="dot">3</div><div><b>Заявка мгновенно у дежурного</b><span>Через 2–3 секунды – в группе клиники в Telegram, MAX или ВК – где удобнее команде. Дубль на почту. Внутри UTM: какая реклама привела человека.</span></div></div>
+        <div class="step"><div class="dot">4</div><div><b>Дежурный перезванивает сразу</b><span>Решение об обращении принимается в моменте. Скорость отклика – главная конверсия в этой сфере.</span></div></div>
+      </div>
+      <div>
+        <div class="tg-card" role="img" aria-label="Пример уведомления об обращении в Telegram">
+          <div class="tg-head"><div class="ava">М</div><div><b>Миннесота · Обращения</b><span>3 участника</span></div></div>
+          <div class="tg-body">
+            <div class="tg-msg">
+              <div class="from">Сайт · бот заявок</div>
+              <p><b>Новая заявка #57 – срочная консультация</b><br>
+              Имя: не указано (анонимно)<br>
+              Телефон: +7 905 ··· ·· ··<br>
+              Направление: алкогольная зависимость</p>
+              <div class="utm">utm_source: yandex_direct<br>utm_campaign: srochnyi_vyzov<br>страница: /alkogolizm</div>
+              <div class="time">03:47</div>
+            </div>
+            <p class="tg-note">Так выглядит обращение в группе дежурных – макет. Мессенджер на ваш выбор: Telegram, MAX или ВК</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="pay-note" style="margin-top:30px"><b>CRM – по желанию:</b> параллельно каждая заявка может автоматически создавать сделку в вашей CRM – например, в Битрикс24 – с телефоном, направлением и UTM-меткой. Подключается любая CRM-система.</p>
+  </div>
+</section>
+
+<!-- 6. СОСТАВ РАБОТ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">05 · Состав работ</div>
+    <h2>Полный цикл – <em>8 этапов</em>, под ключ</h2>
+    <div class="grid g4" style="margin-top:34px">
+      <div class="card"><span class="num">01</span><h3>Исследование</h3><p>Конкуренты в Саратове, запросы, по которым ищут помощь, структура страниц под направления лечения.</p></div>
+      <div class="card"><span class="num">02</span><h3>Концепция</h3><p>До 5 концепций первого экрана: спокойный дизайн, вызывающий доверие в кризисный момент. Утверждаем одну.</p></div>
+      <div class="card"><span class="num">03</span><h3>Дизайн</h3><p>ПК и мобильная версии всех блоков, формы, попапы. Акцент – доверие: врачи, лицензии, анонимность.</p></div>
+      <div class="card"><span class="num">04</span><h3>Сборка</h3><p>Собственный код вместо конструктора: адаптив под все экраны, кроссбраузерность, скорость 90+.</p></div>
+      <div class="card"><span class="num">05</span><h3>Подключения</h3><p>Домен и SSL, Метрика с целями, заявки в мессенджер (Telegram, MAX, ВК) и на почту, онлайн-запись, CRM – например, Битрикс24.</p></div>
+      <div class="card"><span class="num">06</span><h3>Юридический блок</h3><p>152-ФЗ и врачебная тайна: политика, согласия, чекбоксы, cookie-баннер. В медицине это строже, чем где-либо.</p></div>
+      <div class="card"><span class="num">07</span><h3>Запуск</h3><p>Тест каждой формы и каждого номера телефона, проверка скорости, SEO-теги, приёмка.</p></div>
+      <div class="card"><span class="num">08</span><h3>Передача</h3><p>Обучение администраторов, инструкция, месяц поддержки после запуска.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. ПРИЛОЖЕНИЕ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">06 · Приложение</div>
+    <h2>Приложение, которое <em>возвращает пациентов</em></h2>
+    <p class="lead">Лечение зависимости не заканчивается выпиской. Приложение держит связь с пациентом на этапе реабилитации – и возвращает его именно в вашу клинику.</p>
+    <div class="grid g4" style="margin-top:34px">
+      <div class="card"><span class="num">01</span><h3>Личный кабинет</h3><p>Программа лечения, расписание приёмов и процедур, история посещений – всегда под рукой.</p></div>
+      <div class="card"><span class="num">02</span><h3>Напоминания и push</h3><p>Приёмы, препараты, группы поддержки. Мягкие мотивационные уведомления на этапе ремиссии.</p></div>
+      <div class="card"><span class="num">03</span><h3>Связь с клиникой</h3><p>Чат с куратором и кнопка экстренного звонка – на расстоянии одного касания в трудный момент.</p></div>
+      <div class="card"><span class="num">04</span><h3>iOS и Android</h3><p>Кроссплатформенная сборка, публикация в App Store и Google Play, обновления без переустановки.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. ВИЗИТКИ И QR -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">07 · Визитки и QR</div>
+    <h2>Два QR-кода <em>уже готовы</em> – проверьте прямо сейчас</h2>
+    <p class="lead">Наведите камеру телефона на экран: левый код откроет сайт клиники, правый – сразу наберёт номер +7 905 384-61-04. Эти же коды встанут на визитки.</p>
+    <div class="qr-row">
+      <div class="qr-item">
+        <div class="qr-plate cbr">
+          <svg viewBox="0 0 33 33" role="img" aria-label="QR-код: сайт minnesotasar.ru"><path fill="#fff" d="M0 0h33v33H0z"/><path stroke="#0c0c0d" d="M2 2.5h7m4 0h1m3 0h1m2 0h1m1 0h1m1 0h7m-29 1h1m5 0h1m2 0h4m1 0h1m2 0h1m1 0h1m2 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h2m1 0h1m1 0h3m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h4m1 0h1m2 0h2m2 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h4m1 0h1m3 0h2m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h3m3 0h2m3 0h1m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-18 1h2m1 0h2m3 0h2m-18 1h2m1 0h2m1 0h2m2 0h4m1 0h1m1 0h1m4 0h2m-27 1h2m1 0h1m1 0h1m2 0h3m1 0h2m1 0h1m1 0h3m3 0h2m1 0h2m-28 1h1m2 0h1m2 0h2m2 0h1m1 0h1m2 0h1m2 0h1m1 0h3m2 0h1m-26 1h1m1 0h1m2 0h1m1 0h1m3 0h1m2 0h1m2 0h3m3 0h3m2 0h1m-29 1h2m1 0h1m2 0h4m1 0h4m1 0h1m2 0h4m2 0h1m1 0h1m-26 1h2m3 0h2m1 0h4m3 0h1m4 0h1m1 0h1m1 0h3m-29 1h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h5m1 0h1m2 0h1m-27 1h4m1 0h1m3 0h1m1 0h1m2 0h2m3 0h2m1 0h5m-29 1h1m3 0h1m1 0h2m1 0h1m3 0h2m2 0h3m5 0h1m-26 1h1m2 0h1m1 0h1m4 0h1m2 0h1m2 0h1m1 0h4m2 0h3m-27 1h2m4 0h2m4 0h4m3 0h2m3 0h1m3 0h1m-29 1h2m2 0h1m2 0h2m8 0h2m2 0h2m1 0h1m1 0h1m-27 1h2m4 0h2m1 0h1m2 0h2m2 0h1m3 0h5m1 0h2m-20 1h1m1 0h1m1 0h1m7 0h1m3 0h3m-27 1h7m1 0h4m1 0h5m1 0h2m1 0h1m1 0h1m1 0h1m-27 1h1m5 0h1m2 0h1m2 0h1m1 0h1m2 0h4m3 0h2m-26 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m1 0h3m1 0h6m-25 1h1m1 0h3m1 0h1m1 0h2m1 0h2m1 0h1m1 0h3m4 0h1m2 0h2m-28 1h1m1 0h3m1 0h1m3 0h2m1 0h3m4 0h2m1 0h3m1 0h2m-29 1h1m5 0h1m2 0h1m1 0h1m2 0h1m1 0h3m3 0h1m1 0h3m1 0h1m-29 1h7m2 0h2m2 0h1m3 0h1m2 0h5"/></svg>
+        </div>
+        <div class="cap"><b>Сайт клиники</b>minnesotasar.ru</div>
+      </div>
+      <div class="qr-item">
+        <div class="qr-plate cbr">
+          <svg viewBox="0 0 33 33" role="img" aria-label="QR-код: звонок +7 905 384-61-04"><path fill="#fff" d="M0 0h33v33H0z"/><path stroke="#0c0c0d" d="M2 2.5h7m2 0h2m2 0h2m1 0h2m1 0h2m1 0h7m-29 1h1m5 0h1m1 0h2m1 0h6m1 0h2m2 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m2 0h1m1 0h4m4 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m7 0h2m4 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m4 0h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m1 0h2m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h1m1 0h1m8 0h1m-16 1h4m1 0h2m1 0h3m4 0h2m1 0h2m3 0h1m-27 1h2m1 0h2m1 0h1m5 0h1m2 0h4m3 0h1m1 0h2m1 0h1m-29 1h2m1 0h1m1 0h2m1 0h1m1 0h3m1 0h1m4 0h1m2 0h4m2 0h1m-29 1h1m1 0h1m1 0h1m2 0h2m2 0h1m2 0h2m1 0h1m1 0h2m3 0h1m2 0h2m-28 1h2m3 0h1m2 0h1m1 0h1m1 0h2m2 0h1m5 0h1m3 0h1m-28 1h3m1 0h2m2 0h1m3 0h2m1 0h1m1 0h1m2 0h3m1 0h1m1 0h3m-27 1h1m1 0h1m1 0h1m1 0h1m1 0h4m1 0h1m1 0h2m1 0h3m1 0h2m1 0h2m-29 1h2m2 0h2m1 0h1m2 0h1m3 0h1m1 0h1m3 0h1m1 0h4m1 0h1m-28 1h3m3 0h1m2 0h1m2 0h1m3 0h4m4 0h2m1 0h1m-28 1h3m1 0h2m3 0h1m3 0h1m1 0h1m2 0h4m2 0h5m-25 1h1m1 0h2m1 0h5m1 0h1m1 0h2m1 0h2m1 0h1m4 0h1m-25 1h2m4 0h1m2 0h5m4 0h2m3 0h2m-29 1h3m3 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h8m-17 1h1m1 0h1m2 0h2m3 0h1m1 0h1m3 0h1m2 0h2m-29 1h7m1 0h2m2 0h2m1 0h2m2 0h2m1 0h1m1 0h1m2 0h2m-29 1h1m5 0h1m1 0h4m4 0h1m1 0h1m1 0h1m3 0h1m2 0h2m-29 1h1m1 0h3m1 0h1m1 0h1m2 0h2m3 0h2m1 0h6m2 0h1m-28 1h1m1 0h3m1 0h1m4 0h1m3 0h1m2 0h3m5 0h2m-28 1h1m1 0h3m1 0h1m2 0h1m1 0h1m2 0h1m1 0h2m5 0h1m3 0h2m-29 1h1m5 0h1m2 0h1m2 0h1m1 0h1m2 0h1m5 0h2m2 0h2m-29 1h7m2 0h2m1 0h2m1 0h1m1 0h2m3 0h1m2 0h3"/></svg>
+        </div>
+        <div class="cap"><b>Звонок в клинику</b>tel: +7 905 384-61-04</div>
+      </div>
+      <div style="flex:1;min-width:260px">
+        <div class="grid" style="gap:14px">
+          <div class="card"><h3>Устойчивость к повреждениям</h3><p>Уровень коррекции H: код читается даже при потере до 30 % площади – печать, ламинация и потёртости не страшны.</p></div>
+          <div class="card"><h3>Макет двух сторон</h3><p>Дизайн визитки в стиле клиники, подготовка к печати: вылеты, CMYK, PDF. Эти же коды подойдут для буклетов и стендов.</p></div>
+          <div class="card"><h3>Файлы – ваши</h3><p>PNG в высоком разрешении и векторный SVG передаются сразу: используйте в любых материалах без ограничений.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. СРОКИ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">08 · Сроки</div>
+    <h2>Сайт – за <em>10–12 рабочих дней</em></h2>
+    <div class="sprints">
+      <div class="sprint"><span class="d">Дни 1–3</span><b>Исследование и концепции</b><p>Конкуренты, запросы, референсы. До 5 концепций первого экрана – вы выбираете одну.</p></div>
+      <div class="sprint"><span class="d">Дни 4–8</span><b>Дизайн и сборка</b><p>Все блоки в ПК и мобильной версии, формы, онлайн-запись. Параллельно – сборка в коде.</p></div>
+      <div class="sprint"><span class="d">Дни 9–12</span><b>Интеграции и запуск</b><p>Telegram, Метрика, юр-блок, тест каждого номера и формы, перенос на домен, приёмка.</p></div>
+    </div>
+    <p class="pay-note">Админка добавляет 5–7 рабочих дней, приложение – 4–6 недель и идёт параллельно: сайт его не ждёт. Визитки – 2–3 дня. Ход работ виден в общем чате: каждый этап сдаётся ссылкой, которую можно открыть и потрогать.</p>
+  </div>
+</section>
+
+<!-- 10. СТОИМОСТЬ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">09 · Стоимость</div>
+    <h2>Четыре пакета – <em>фикс по смете</em></h2>
+    <div class="plans" style="margin-top:34px">
+      <div class="card plan">
+        <h3>Визитки с QR</h3>
+        <div class="price">5 000 ₽ <i>разово</i></div>
+        <ul>
+          <li>Дизайн-макет двух сторон</li>
+          <li>Оба QR – сайт и звонок (готовы)</li>
+          <li>Подготовка к печати: вылеты, CMYK</li>
+          <li>Исходники – ваши</li>
+        </ul>
+      </div>
+      <div class="card plan">
+        <h3>Сайт под ключ</h3>
+        <div class="price">40 000 ₽ <i>разово</i></div>
+        <ul>
+          <li>Все 8 этапов состава работ</li>
+          <li>Заявки в Telegram + почта, UTM</li>
+          <li>Рабочий звонок с каждого экрана</li>
+          <li>Метрика, цели, юр-блок 152-ФЗ</li>
+          <li>Месяц поддержки после запуска</li>
+        </ul>
+      </div>
+      <div class="card plan hot cbr">
+        <span class="tag">Оптимально</span>
+        <h3>Сайт + админка</h3>
+        <div class="price">60 000 ₽ <i>разово</i></div>
+        <ul>
+          <li>Всё из «Сайта под ключ»</li>
+          <li>Админка: врачи, цены, акции – сами</li>
+          <li>Раздел новостей и статей</li>
+          <li>Обучение администраторов</li>
+        </ul>
+      </div>
+      <div class="card plan">
+        <span class="tag">Максимум</span>
+        <h3>Сайт + админка + приложение</h3>
+        <div class="price">120 000 ₽ <i>разово</i></div>
+        <ul>
+          <li>Всё из «Сайт + админка»</li>
+          <li>Приложение iOS и Android</li>
+          <li>Кабинет пациента, push, чат</li>
+          <li>Публикация в App Store и Google Play</li>
+        </ul>
+      </div>
+    </div>
+    <p class="pay-note"><b>Оплата поэтапно: 50 % на старте, 50 % после приёмки.</b> Смета фиксируется до начала работ и не растёт в процессе. При заказе любого пакета с сайтом визитки с QR – в подарок.</p>
+  </div>
+</section>
+
+<!-- 11. СЛЕДУЮЩИЕ ШАГИ -->
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">10 · Следующие шаги</div>
+    <h2>Начать можно <em>на этой неделе</em></h2>
+    <div class="grid g4" style="margin-top:34px">
+      <div class="card"><span class="num">01</span><h3>Встреча 20 минут</h3><p>Покажу полный разбор текущего сайта и отвечу на вопросы.</p></div>
+      <div class="card"><span class="num">02</span><h3>Выбор пакета</h3><p>Утверждаем состав работ и смету, собираю доступы: домен, Метрика, Telegram-группа.</p></div>
+      <div class="card"><span class="num">03</span><h3>Старт</h3><p>Предоплата 50 % – и через 3 рабочих дня показываю концепции первого экрана.</p></div>
+      <div class="card"><span class="num">04</span><h3>Запуск</h3><p>Через 10–12 рабочих дней обращения падают в Telegram дежурного.</p></div>
+    </div>
+    <div class="contact-box cbr">
+      <div class="who"><b>Omenik.Digital</b><span>Никита Омельченко · сайты · админки · приложения</span></div>
+      <div class="links">
+        <!-- TODO: добавьте телефон и Telegram -->
+        <a href="mailto:omelchenko.sales1@gmail.com">omelchenko.sales1@gmail.com</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<div class="chrome-bottom">
+  <div class="hint"><kbd>←</kbd> <kbd>→</kbd> листать · <kbd>P</kbd> печать в PDF</div>
+  <div class="navbtns">
+    <button class="nbtn" id="prev" aria-label="Предыдущий слайд">←</button>
+    <button class="nbtn" id="next" aria-label="Следующий слайд">→</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var track=document.getElementById('track'),
+      slides=track.children.length,
+      bar=document.getElementById('bar'),
+      counter=document.getElementById('counter'),
+      prev=document.getElementById('prev'),
+      next=document.getElementById('next'),
+      idx=0,
+      mq=window.matchMedia('(max-width:900px)');
+
+  function pad(n){return (n<10?'0':'')+n}
+  function apply(){
+    if(!mq.matches){track.style.transform='translateX(-'+(idx*100)+'vw)';}
+    bar.style.width=((idx+1)/slides*100)+'%';
+    counter.innerHTML='<b>'+pad(idx+1)+'</b> / '+pad(slides);
+    prev.disabled=idx===0; next.disabled=idx===slides-1;
+    if(history.replaceState) history.replaceState(null,'','#'+(idx+1));
+  }
+  function go(n){ idx=Math.max(0,Math.min(slides-1,n)); apply(); }
+
+  prev.addEventListener('click',function(){go(idx-1)});
+  next.addEventListener('click',function(){go(idx+1)});
+  document.addEventListener('keydown',function(e){
+    if(mq.matches) return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();go(idx+1);}
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(idx-1);}
+    else if(e.key==='Home'){e.preventDefault();go(0);}
+    else if(e.key==='End'){e.preventDefault();go(slides-1);}
+    else if(e.key==='p'||e.key==='P'){window.print();}
+  });
+  mq.addEventListener('change',function(){ if(mq.matches){track.style.transform='none';} apply(); });
+
+  var h=parseInt(location.hash.slice(1),10);
+  if(h>=1&&h<=slides) idx=h-1;
+  apply();
+})();
+</script>
+</body>
+</html>
